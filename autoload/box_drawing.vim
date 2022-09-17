@@ -19,7 +19,7 @@ function! s:replaceCharUnderCursor(str) abort
 endfunction
 
 " move cursor to next/prev line and keep column
-function! box-drawing#moveLine(offset) abort
+function! box_drawing#moveLine(offset) abort
 	let mycol = virtcol('.')
 	let linestr = getline(line('.')+a:offset)
 	let linelen = strwidth(linestr)
@@ -37,7 +37,7 @@ function! box-drawing#moveLine(offset) abort
 endfunction
 
 " move corsor to left/right (multibyte character)
-function! box-drawing#moveCol(offset) abort
+function! box_drawing#moveCol(offset) abort
 	let mycol = virtcol('.')
 	let linestr = getline('.')
 	let linelen = strwidth(linestr)
@@ -54,7 +54,7 @@ function! box-drawing#moveCol(offset) abort
 	call setcharpos('.',[0,line('.'),mycol+a:offset,0])
 endfunction
 
-function! box-drawing#debug() abort
+function! box_drawing#debug() abort
 	echo "virtcol" virtcol('.')
 	echo "col"     col('.')
 	echo "strlen"  strlen(getline('.'))
@@ -90,42 +90,42 @@ function! s:connect(table, default) abort
 	call s:replaceCharUnderCursor(newstr)
 endfunction
 
-function! box-drawing#singleLineToLeft() abort
+function! box_drawing#singleLineToLeft() abort
 	call s:connectLeft()
-	call box-drawing#moveCol(-1)
+	call box_drawing#moveCol(-1)
 	call s:connectRight()
 endfunction
-function! box-drawing#singleLineToRight() abort
+function! box_drawing#singleLineToRight() abort
 	call s:connectRight()
-	call box-drawing#moveCol(1)
+	call box_drawing#moveCol(1)
 	call s:connectLeft()
 endfunction
-function! box-drawing#singleLineToBottom() abort
+function! box_drawing#singleLineToBottom() abort
 	call s:connectBottom()
-	call box-drawing#moveLine(1)
+	call box_drawing#moveLine(1)
 	call s:connectTop()
 endfunction
-function! box-drawing#singleLineToTop() abort
+function! box_drawing#singleLineToTop() abort
 	call s:connectTop()
-	call box-drawing#moveLine(-1)
+	call box_drawing#moveLine(-1)
 	call s:connectBottom()
 endfunction
 
-function! box-drawing#map() abort
-	nmap <buffer> j :call box-drawing#moveLine(1)<CR>
-	nmap <buffer> k :call box-drawing#moveLine(-1)<CR>
-	nmap <buffer> h :call box-drawing#moveCol(-1)<CR>
-	nmap <buffer> l :call box-drawing#moveCol(1)<CR>
+function! box_drawing#map() abort
+	nmap <buffer> j :call box_drawing#moveLine(1)<CR>
+	nmap <buffer> k :call box_drawing#moveLine(-1)<CR>
+	nmap <buffer> h :call box_drawing#moveCol(-1)<CR>
+	nmap <buffer> l :call box_drawing#moveCol(1)<CR>
 
-	nmap <buffer> J :call box-drawing#singleLineToBottom()<CR>
-	nmap <buffer> K :call box-drawing#singleLineToTop()<CR>
-	nmap <buffer> H :call box-drawing#singleLineToLeft()<CR>
-	nmap <buffer> L :call box-drawing#singleLineToRight()<CR>
+	nmap <buffer> J :call box_drawing#singleLineToBottom()<CR>
+	nmap <buffer> K :call box_drawing#singleLineToTop()<CR>
+	nmap <buffer> H :call box_drawing#singleLineToLeft()<CR>
+	nmap <buffer> L :call box_drawing#singleLineToRight()<CR>
 
-	nmap <buffer> <ESC> :call box-drawing#unmap()<CR>
+	nmap <buffer> <ESC> :call box_drawing#unmap()<CR>
 endfunction
 
-function! box-drawing#unmap() abort
+function! box_drawing#unmap() abort
 	:mapclear <buffer>
 endfunction
 
