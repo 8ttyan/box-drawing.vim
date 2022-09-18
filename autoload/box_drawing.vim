@@ -19,7 +19,7 @@ function! s:replaceCharUnderCursor(str) abort
 endfunction
 
 " move cursor to next/prev line and keep column
-function! box_drawing#moveLine(offset) abort
+function! box_drawing#moveRow(offset) abort
 	let mycol = virtcol('.')
 	let linestr = getline(line('.')+a:offset)
 	let linelen = strwidth(linestr)
@@ -54,6 +54,19 @@ function! box_drawing#moveCol(offset) abort
 	call setcharpos('.',[0,line('.'),mycol+a:offset,0])
 endfunction
 
+function! box_drawing#moveCursorUp() abort
+	call box_drawing#moveRow(-1)
+endfunction
+function! box_drawing#moveCursorDown() abort
+	call box_drawing#moveRow(1)
+endfunction
+function! box_drawing#moveCursorLeft() abort
+	call box_drawing#moveCol(-1)
+endfunction
+function! box_drawing#moveCursorRight() abort
+	call box_drawing#moveCol(1)
+endfunction
+
 function! box_drawing#debug() abort
 	echo "virtcol" virtcol('.')
 	echo "col"     col('.')
@@ -62,119 +75,119 @@ function! box_drawing#debug() abort
 	echo "strdisplaywidth" strdisplaywidth(getline('.'))
 endfunction
 
-" replace char by table
-function! s:connect(table, default) abort
+" replace character under cursor by table
+function! s:replaceCharUnderCursorTable(table, default) abort
 	let curstr = s:getCharUnderCursor()
 	let newstr = get(a:table,curstr,a:default)
 	call s:replaceCharUnderCursor(newstr)
 endfunction
 
-" connect functions
-function! s:connectLeft() abort
-	let table = {'│':'┤', '─':'─', '┐':'┐', '┌':'┬', '└':'┴', '┘':'┘', '├':'┼', '┤':'┤', '┬':'┬', '┴':'┴', '┼':'┼', '╴':'╴', '╵':'┘', '╶':'─', '╷':'┐'}
+" Base functions (Draw single line)
+function! s:singleLeft() abort
+	let table = { '─':'─', '│':'┤', '┐':'┐', '┌':'┬', '└':'┴', '┘':'┘', '├':'┼', '┤':'┤', '┬':'┬', '┴':'┴', '┼':'┼', '╴':'╴', '╵':'┘', '╶':'─', '╷':'┐'}
 	let default = '╴'
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
-function! s:connectRight() abort
-	let table = { '│':'├', '─':'─', '┐':'┬', '┌':'┬', '└':'└', '┘':'┴', '├':'├', '┤':'┼', '┬':'┬', '┴':'┴', '┼':'┼', '╴':'─', '╵':'└', '╶':'─', '╷':'┌'}
+function! s:singleRight() abort
+	let table = { '─':'─', '│':'├', '┐':'┬', '┌':'┬', '└':'└', '┘':'┴', '├':'├', '┤':'┼', '┬':'┬', '┴':'┴', '┼':'┼', '╴':'─', '╵':'└', '╶':'─', '╷':'┌'}
 	let default = '╶'
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
-function! s:connectBottom() abort
-	let table = { '│':'│', '─':'┬', '┐':'┐', '┌':'┌', '└':'├', '┘':'┤', '├':'├', '┤':'┤', '┬':'┬', '┴':'┼', '┼':'┼', '╴':'┐', '╵':'│', '╶':'┌', '╷':'╷'}
+function! s:singleDown() abort
+	let table = { '─':'┬', '│':'│', '┐':'┐', '┌':'┌', '└':'├', '┘':'┤', '├':'├', '┤':'┤', '┬':'┬', '┴':'┼', '┼':'┼', '╴':'┐', '╵':'│', '╶':'┌', '╷':'╷'}
 	let default = '╷'
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
-function! s:connectTop() abort
-	let table = { '│':'│', '─':'┴', '┐':'┤', '┌':'├', '└':'└', '┘':'┘', '├':'├', '┤':'┤', '┬':'┼', '┴':'┴', '┼':'┼', '╴':'┘', '╵':'╵', '╶':'└', '╷':'│'}
+function! s:singleUp() abort
+	let table = { '─':'┴','│':'│',  '┐':'┤', '┌':'├', '└':'└', '┘':'┘', '├':'├', '┤':'┤', '┬':'┼', '┴':'┴', '┼':'┼', '╴':'┘', '╵':'╵', '╶':'└', '╷':'│'}
 	let default = '╵'
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
 
-" discnnect functions
-function! s:disconnectLeft() abort
-	let table = {'│':'│', '─':'╶', '┐':'╷', '┌':'┌', '└':'└', '┘':'╵', '├':'├', '┤':'│', '┬':'┌', '┴':'└', '┼':'├', '╴':' ', '╵':' ', '╶':'╶', '╷':'╷'}
+" Base functions (Erase line)
+function! s:eraseLeft() abort
+	let table = {'─':'╶', '│':'│', '┐':'╷', '┌':'┌', '└':'└', '┘':'╵', '├':'├', '┤':'│', '┬':'┌', '┴':'└', '┼':'├', '╴':' ', '╵':' ', '╶':'╶', '╷':'╷'}
 	let default = ' '
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
-function! s:disconnectRight() abort
-	let table = {'│':'│', '─':'╴', '┐':'┐', '┌':'╷', '└':'╵', '┘':'┘', '├':'│', '┤':'┤', '┬':'┐', '┴':'┘', '┼':'┤', '╴':'╴', '╵':'╵', '╶':' ', '╷':'╷'}
+function! s:eraseRight() abort
+	let table = {'─':'╴', '│':'│', '┐':'┐', '┌':'╷', '└':'╵', '┘':'┘', '├':'│', '┤':'┤', '┬':'┐', '┴':'┘', '┼':'┤', '╴':'╴', '╵':'╵', '╶':' ', '╷':'╷'}
 	let default = ' '
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
-function! s:disconnectBottom() abort
-	let table = {'│':'╵', '─':'╶', '┐':'╴', '┌':'╶', '└':'└', '┘':'┘', '├':'└', '┤':'┘', '┬':'─', '┴':'┴', '┼':'┴', '╴':'╴', '╵':'╵', '╶':'╶', '╷':' '}
+function! s:eraseDown() abort
+	let table = {'─':'─', '│':'╵', '┐':'╴', '┌':'╶', '└':'└', '┘':'┘', '├':'└', '┤':'┘', '┬':'─', '┴':'┴', '┼':'┴', '╴':'╴', '╵':'╵', '╶':'╶', '╷':' '}
 	let default = ' '
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
-function! s:disconnectTop() abort
-	let table = {'│':'╷', '─':'─', '┐':'┐', '┌':'┌', '└':'╶', '┘':'╴', '├':'┌', '┤':'┐', '┬':'┬', '┴':'─', '┼':'┬', '╴':'╴', '╵':' ', '╶':'╶', '╷':'╷'}
+function! s:eraseUp() abort
+	let table = {'─':'─', '│':'╷', '┐':'┐', '┌':'┌', '└':'╶', '┘':'╴', '├':'┌', '┤':'┐', '┬':'┬', '┴':'─', '┼':'┬', '╴':'╴', '╵':' ', '╶':'╶', '╷':'╷'}
 	let default = ' '
-	call s:connect(table,default)
+	call s:replaceCharUnderCursorTable(table,default)
 endfunction
 
-" Draw single line
-function! box_drawing#singleLineToLeft() abort
-	call s:connectLeft()
-	call box_drawing#moveCol(-1)
-	call s:connectRight()
+" Move single line pen
+function! box_drawing#moveSinglePenLeft() abort
+	call s:singleLeft()
+	call box_drawing#moveCursorLeft()
+	call s:singleRight()
 endfunction
-function! box_drawing#singleLineToRight() abort
-	call s:connectRight()
-	call box_drawing#moveCol(1)
-	call s:connectLeft()
+function! box_drawing#moveSinglePenRight() abort
+	call s:singleRight()
+	call box_drawing#moveCursorRight()
+	call s:singleLeft()
 endfunction
-function! box_drawing#singleLineToBottom() abort
-	call s:connectBottom()
-	call box_drawing#moveLine(1)
-	call s:connectTop()
+function! box_drawing#moveSinglePenDown() abort
+	call s:singleDown()
+	call box_drawing#moveCursorDown()
+	call s:singleUp()
 endfunction
-function! box_drawing#singleLineToTop() abort
-	call s:connectTop()
-	call box_drawing#moveLine(-1)
-	call s:connectBottom()
+function! box_drawing#moveSinglePenUp() abort
+	call s:singleUp()
+	call box_drawing#moveCursorUp()
+	call s:singleDown()
 endfunction
 
-" Erase single line
-function! box_drawing#eraserToLeft() abort
-	call s:disconnectLeft()
-	call box_drawing#moveCol(-1)
-	call s:disconnectRight()
+" Move eraser
+function! box_drawing#moveEraserLeft() abort
+	call s:eraseLeft()
+	call box_drawing#moveCursorLeft()
+	call s:eraseRight()
 endfunction
-function! box_drawing#eraserToRight() abort
-	call s:disconnectRight()
-	call box_drawing#moveCol(1)
-	call s:disconnectLeft()
+function! box_drawing#moveEraserRight() abort
+	call s:eraseRight()
+	call box_drawing#moveCursorRight()
+	call s:eraseLeft()
 endfunction
-function! box_drawing#eraserToBottom() abort
-	call s:disconnectBottom()
-	call box_drawing#moveLine(1)
-	call s:disconnectTop()
+function! box_drawing#moveEraserDown() abort
+	call s:eraseDown()
+	call box_drawing#moveCursorDown()
+	call s:eraseUp()
 endfunction
-function! box_drawing#eraserToTop() abort
-	call s:disconnectTop()
-	call box_drawing#moveLine(-1)
-	call s:disconnectBottom()
+function! box_drawing#moveEraserUp() abort
+	call s:eraseUp()
+	call box_drawing#moveCursorUp()
+	call s:eraseDown()
 endfunction
 
 function! box_drawing#map() abort
 	"move
-	nnoremap <silent><buffer> j :call box_drawing#moveLine(1)<CR>
-	nnoremap <silent><buffer> k :call box_drawing#moveLine(-1)<CR>
-	nnoremap <silent><buffer> h :call box_drawing#moveCol(-1)<CR>
-	nnoremap <silent><buffer> l :call box_drawing#moveCol(1)<CR>
+	nnoremap <silent><buffer> j :call box_drawing#moveCursorDown()<CR>
+	nnoremap <silent><buffer> k :call box_drawing#moveCursorUp()<CR>
+	nnoremap <silent><buffer> h :call box_drawing#moveCursorLeft()<CR>
+	nnoremap <silent><buffer> l :call box_drawing#moveCursorRight()<CR>
 
 	"single line
-	nnoremap <silent><buffer> J :call box_drawing#singleLineToBottom()<CR>
-	nnoremap <silent><buffer> K :call box_drawing#singleLineToTop()<CR>
-	nnoremap <silent><buffer> H :call box_drawing#singleLineToLeft()<CR>
-	nnoremap <silent><buffer> L :call box_drawing#singleLineToRight()<CR>
+	nnoremap <silent><buffer> J :call box_drawing#moveSinglePenDown()<CR>
+	nnoremap <silent><buffer> K :call box_drawing#moveSinglePenUp()<CR>
+	nnoremap <silent><buffer> H :call box_drawing#moveSinglePenLeft()<CR>
+	nnoremap <silent><buffer> L :call box_drawing#moveSinglePenRight()<CR>
 
 	"erase line
-	nnoremap <silent><buffer> <c-j> :call box_drawing#eraserToBottom()<CR>
-	nnoremap <silent><buffer> <c-k> :call box_drawing#eraserToTop()<CR>
-	nnoremap <silent><buffer> <c-h> :call box_drawing#eraserToLeft()<CR>
-	nnoremap <silent><buffer> <c-l> :call box_drawing#eraserToRight()<CR>
+	nnoremap <silent><buffer> <c-j> :call box_drawing#moveEraserDown()<CR>
+	nnoremap <silent><buffer> <c-k> :call box_drawing#moveEraserUp()<CR>
+	nnoremap <silent><buffer> <c-h> :call box_drawing#moveEraserLeft()<CR>
+	nnoremap <silent><buffer> <c-l> :call box_drawing#moveEraserRight()<CR>
 
 	"escape keybind
 	nnoremap <silent><buffer> <ESC> :call box_drawing#unmap()<CR>
