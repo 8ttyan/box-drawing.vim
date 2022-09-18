@@ -1,3 +1,2 @@
-command! Boxdraw call boxdraw#map()
-command! BoxdrawStop call boxdraw#unmap()
+command! Boxdrawing  call box_drawing#map()
 
