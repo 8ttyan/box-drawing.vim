@@ -1,6 +1,10 @@
 # box-drawing.vim
 Unicode box-drawing Vim plugin
 
+## Screen shot
+
+https://user-images.githubusercontent.com/28254963/190942471-40ae1eae-2e50-4638-8c2e-744d2ae4555f.mov
+
 ## Usage
 
 Type the command.
